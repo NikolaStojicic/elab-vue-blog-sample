@@ -27,51 +27,7 @@ export default {
   },
   data() {
     return {
-      arrayOfCards: [
-        {
-          id: 1,
-          title: "Title1",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        },
-        {
-          id: 2,
-          title: "Title2",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        },
-        {
-          id: 3,
-          title: "Title3",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        },
-        {
-          id: 4,
-          title: "Title4",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        },
-        {
-          id: 5,
-          title: "Titl5",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        },
-        {
-          id: 6,
-          title: "Title6",
-          subtitle: "Subtitle1",
-          content: "Content1",
-          img: "no-img"
-        }
-      ],
-      counter: 0,
+      arrayOfCards: [],
       modalItem: {
         title: "",
         subtitle: "",
@@ -81,26 +37,29 @@ export default {
     };
   },
   methods: {
-    newPost(payload) {
+    async newPost(payload) {
       this.modalItem = {
         title: "",
         subtitle: "",
         content: "",
         img: "no-img"
       };
-      this.arrayOfCards.push({ ...payload, id: ++this.counter });
+
+      await this.$axios.post("http://localhost:5000/card", payload);
+      await this.refreshContent();
     },
-    editItem(payload) {
+    async editItem(payload) {
       const id = payload.id;
-      const cardById = this.arrayOfCards.find(el => el.id === id);
-      cardById.title = payload.title;
-      cardById.subtitle = payload.subtitle;
-      cardById.content = payload.content;
-      cardById.img = payload.img;
+      await this.$axios.put(`http://localhost:5000/card/${id}`, payload);
+      this.refreshContent();
+    },
+    async refreshContent() {
+      const res = await this.$axios.get("http://localhost:5000/cards");
+      this.arrayOfCards = res.data;
     }
   },
-  created() {
-    this.counter = this.arrayOfCards.length;
+  async created() {
+    await this.refreshContent();
   }
 };
 </script>
